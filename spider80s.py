@@ -11,7 +11,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from parser_thunder import parser
-MOVIES = ['远大前程','一人之下[第二季]']
+
+MOVIES = ['远大前程']
 
 _LOG = logging.getLogger(__name__)
 _LOG.setLevel(logging.INFO)
@@ -116,7 +117,7 @@ class Spider80s:
         for file in files:
             movie = MovieDownload()
             movie.name = file.a.get_text()
-            movie.type = file.findAll('span',{'class':re.compile('label-quality.*')})[0].get_text()
+            movie.type = file.findAll('span', {'class': re.compile('label-quality.*')})[0].get_text()
             movie.format = select(file, 'label-ext-1')
             movie.size = select(file, 'label-filesize')
             movie.address = file.a.get('href')
