@@ -10,7 +10,6 @@ import logging
 import re
 import requests
 from bs4 import BeautifulSoup
-from parser_thunder import parser
 
 MOVIES = ['远大前程']
 
@@ -60,6 +59,14 @@ class Spider80s:
         self.url = 'https://www.80s.tt/'
         self._movies = list()
         self._request = requests.session()
+        self._request.verify = False
+        self._load()
+
+    def _load(self):
+        response = self._request.get(self.url)
+        print(response.url)
+        self.url = response.url
+        self._request.close()
 
     def _search_item(self):
         """
@@ -133,6 +140,7 @@ class Spider80s:
         for _mov in self._movies:
             with open(f'{_mov.name}-{_mov.id}', 'w', encoding='utf-8') as writer:
                 text = '\n'.join(_mov.get_urls())
+                _LOG.info(text)
                 writer.writelines(text)
 
     def run(self):
