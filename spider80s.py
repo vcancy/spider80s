@@ -6,12 +6,13 @@ __author__ = "vcancy"
 80s电影爬虫，爬取给定电影/电视剧的迅雷下载地址，输出到对应文件
 """
 
+import sys
 import logging
 import re
 import requests
 from bs4 import BeautifulSoup
 
-MOVIES = ['远大前程']
+MOVIES = []
 
 _LOG = logging.getLogger(__name__)
 _LOG.setLevel(logging.INFO)
@@ -64,7 +65,6 @@ class Spider80s:
 
     def _load(self):
         response = self._request.get(self.url)
-        print(response.url)
         self.url = response.url
         self._request.close()
 
@@ -153,5 +153,7 @@ class Spider80s:
 
 
 if __name__ == '__main__':
+    mov_list = sys.argv[1:]
+    MOVIES.extend(mov_list)
     spider = Spider80s()
     spider.run()
