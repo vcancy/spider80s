@@ -120,13 +120,13 @@ class Spider80s:
         _movies = []
         bs_obj = BeautifulSoup(html, "lxml")
         files = bs_obj.select('#files')[0].select('div.td-dl-links')
-        select = lambda tag, key: tag.select(f'span.{key}')[0].get_text()
+        select = lambda tag, key: tag.select(f'span.{key}')
         for file in files:
             movie = MovieDownload()
             movie.name = file.a.get_text()
             movie.type = file.findAll('span', {'class': re.compile('label-quality.*')})[0].get_text()
-            movie.format = select(file, 'label-ext-1')
-            movie.size = select(file, 'label-filesize')
+            movie.format = select(file, 'label-ext-1')[0].get_text() if select(file, 'label-ext-1') else None
+            movie.size = select(file, 'label-filesize')[0].get_text() if select(file, 'label-filesize') else None
             movie.address = file.a.get('href')
             _movies.append(movie)
         return _movies
