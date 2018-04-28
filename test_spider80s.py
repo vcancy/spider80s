@@ -1,7 +1,8 @@
 __author__ = "vcancy"
 
 from unittest import TestCase
-from spider80s import Spider80s
+
+from scripts.spider80s import Spider80s
 
 
 # /usr/bin/python
