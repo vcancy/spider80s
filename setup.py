@@ -6,7 +6,7 @@ except:
 from codecs import open
 from os import path
 
-VERSION = '0.0.3'
+VERSION = '0.0.4'
 
 AUTHOR = "vcancy"
 

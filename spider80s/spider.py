@@ -35,7 +35,8 @@ class Movie:
         self.downloads = None
 
     def get_urls(self):
-        return [f'{download.name} : {download.address}' for download in self.downloads]
+        return ['{}[{}][{}]:\n{}\n'.format(download.name, download.type, download.size, download.address) for download in
+                self.downloads]
 
 
 class MovieDownload:
@@ -74,9 +75,9 @@ class Spider80s:
         :return:
         """
         for _mov in MOVIES:
-            _LOG.info(f'start search {_mov}')
+            _LOG.info('开始搜索[{}]'.format(_mov))
             data = {'keyword': _mov}
-            response = self._request.request('POST', f'{self.url}/search', data=data)
+            response = self._request.request('POST', '{}/search'.format(self.url), data=data)
             self._parse_search_list(response.text, _mov)
         self._request.close()
 
@@ -108,11 +109,11 @@ class Spider80s:
         md_list = []
         response = self._request.request(
             method='GET',
-            url=f'{self.url}/movie/{page_id}'
+            url='{}/movie/{}'.format(self.url, page_id)
         )
         if response.status_code == 200:
             self._request.close()
-            _LOG.info(f'_parse:{page_id}')
+            _LOG.info('发现下载页,开始解析:{}'.format('{}/movie/{}'.format(self.url, page_id)))
             return self.parse_downloads_urls(response.text)
         return md_list
 
@@ -120,7 +121,7 @@ class Spider80s:
         _movies = []
         bs_obj = BeautifulSoup(html, "lxml")
         files = bs_obj.select('#files')[0].select('div.td-dl-links')
-        select = lambda tag, key: tag.select(f'span.{key}')
+        select = lambda tag, key: tag.select('span.{}'.format(key))
         for file in files:
             movie = MovieDownload()
             movie.name = file.a.get_text()
@@ -136,12 +137,16 @@ class Spider80s:
         输出电影信息到文件
         :return:
         """
-        _LOG.info(f'start out movies {len(self._movies)}')
+        if not self._movies:
+            _LOG.info("Sorry,80s未搜索到下载地址.")
         for _mov in self._movies:
-            with open(f'{_mov.name}-{_mov.id}', 'w', encoding='utf-8') as writer:
+            _LOG.info("\n{}[{}][{}][{}]\n".format(_mov.name, _mov.type, _mov.year, _mov.rank))
+            file = '{}-{}.txt'.format(_mov.name, _mov.id)
+            with open(file, 'w', encoding='utf-8') as writer:
                 text = '\n'.join(_mov.get_urls())
                 _LOG.info(text)
                 writer.writelines(text)
+            _LOG.info("\n-->输出文件:{}".format(file))
 
     def run(self):
         """
@@ -152,8 +157,13 @@ class Spider80s:
         self._output_movies()
 
 
-if __name__ == '__main__':
+def main():
+    requests.packages.urllib3.disable_warnings()
     mov_list = sys.argv[1:]
     MOVIES.extend(mov_list)
     spider = Spider80s()
     spider.run()
+
+
+if __name__ == '__main__':
+    main()
